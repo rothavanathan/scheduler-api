@@ -15,6 +15,11 @@ wss.on("connection", socket => {
       socket.send(JSON.stringify("pong"));
     }
   };
+
+  socket.onclose = () => {
+    console.log(`socket closed.`);
+    socket.send(JSON.stringify("socketClosed"));
+  }
 });
 
 function updateAppointment(id, interview) {
