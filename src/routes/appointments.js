@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-module.exports = (db, updateAppointment) => {
+module.exports = (db, updateAppointment, cancelAppointment) => {
   router.get("/appointments", (request, response) => {
     db.query(
       `
@@ -31,8 +31,9 @@ module.exports = (db, updateAppointment) => {
       setTimeout(() => response.status(500).json({}), 1000);
       return;
     }
-
-    const { student, interviewer } = request.body.interview;
+    console.log(request.body)
+    const { student, interviewer} = request.body.interview;
+    const { changeSpots, type } = request.body
 
     db.query(
       `
@@ -45,7 +46,7 @@ module.exports = (db, updateAppointment) => {
       .then(() => {
         setTimeout(() => {
           response.status(204).json({});
-          updateAppointment(Number(request.params.id), request.body.interview);
+          updateAppointment(Number(request.params.id), request.body.interview, changeSpots, type);
         }, 1000);
       })
       .catch(error => console.log(error));

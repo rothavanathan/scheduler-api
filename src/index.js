@@ -14,22 +14,38 @@ wss.on("connection", socket => {
     if (event.data === "ping") {
       socket.send(JSON.stringify("pong"));
     }
+    
   };
 
-  socket.onclose = () => {
+  socket.addEventListener("close", () => {
     console.log(`socket closed.`);
-    socket.send(JSON.stringify("socketClosed"));
-  }
+  });
 });
 
-function updateAppointment(id, interview) {
+function updateAppointment(id, interview, changeSpots = false, type = "CANCEL_INTERVIEW") {
+  wss.clients.forEach(function eachClient(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(
+        JSON.stringify({        
+          id,
+          interview,
+          changeSpots,
+          type
+        })
+      );
+    }
+  });
+}
+
+function cancelAppointment(id) {
   wss.clients.forEach(function eachClient(client) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(
         JSON.stringify({
-          type: "SET_INTERVIEW",
           id,
-          interview
+          interview: null,
+          changeSpots: true,
+          type: "CANCEL_INTERVIEW"
         })
       );
     }
